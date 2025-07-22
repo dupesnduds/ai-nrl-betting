@@ -12,6 +12,7 @@ Machine learning platform for NRL match predictions using multiple models.
 - Logistic Regression
 - LightGBM 
 - Stacker Ensemble
+- Transformer
 
 ## Development
 
