@@ -1,0 +1,424 @@
+# =============================================================================
+# AI BETTING PLATFORM - GITIGNORE
+# =============================================================================
+# Optimized for GitHub repository size - excludes large data files and models
+# These files can be regenerated, downloaded separately, or stored in LFS/cloud
+
+# =============================================================================
+# DATA FILES AND DATASETS (LARGEST SPACE SAVINGS)
+# =============================================================================
+
+# All data directories - contains multi-GB datasets
+# Exception: allow small trained models
+data/
+*/data/
+**/data/
+!data/models/trained/
+!data/models/trained/*.joblib
+!data/models/trained/*.pth
+
+# Specific large data file patterns
+*.sqlite
+*.sqlite3
+*.db
+*.csv.monitor.csv
+
+# Large JSON datasets (NRL historical data)
+datasets/
+**/datasets/
+NRL_data_*.json
+NRL_detailed_match_data_*.json
+NRL_odds_*.json
+NRL_player_statistics_*.json
+merged_nrl_all_*.json
+
+# Finetune datasets
+*_finetune_data.*
+*.jsonl
+
+# =============================================================================
+# MACHINE LEARNING MODELS AND ARTIFACTS
+# =============================================================================
+
+# Trained models directory
+models/
+*/models/
+**/models/
+
+# Model file extensions (except small trained models)
+*.joblib
+!data/models/trained/*.joblib
+*.pth  
+!data/models/trained/*.pth
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.model
+*.bin
+*.safetensors
+
+# Specific model artifacts
+*.zip
+checkpoint-*/
+checkpoints/
+best_model/
+eval_logs/
+feature_scaler_*.joblib
+final_model_*.zip
+*_embeddings.joblib
+
+# Training logs and monitoring
+*.npz
+monitor_*.csv
+training_args.*
+trainer_state.json
+all_results.json
+train_results.json
+
+# Model configuration that can be regenerated
+generation_config.json
+tokenizer.json
+vocab.json
+merges.txt
+
+# =============================================================================
+# CACHE AND TEMPORARY FILES
+# =============================================================================
+
+# Application caches
+cache/
+*/cache/
+**/cache/
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build and distribution
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# =============================================================================
+# NODE.JS AND FRONTEND
+# =============================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production builds
+/build
+/dist
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# NYC test coverage
+.nyc_output
+
+# ESLint cache
+.eslintcache
+
+# =============================================================================
+# PYTHON AND VIRTUAL ENVIRONMENTS
+# =============================================================================
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+backend_env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# =============================================================================
+# ENVIRONMENT AND SECRETS
+# =============================================================================
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase service account keys (SECURITY CRITICAL)
+*firebase-adminsdk*.json
+firebase_service_account.json
+service-account-*.json
+
+# Database files with user data
+user_data.db
+purchase_data.db
+*.db
+
+# API keys and secrets
+secrets/
+.secrets/
+*.key
+*.pem
+
+# =============================================================================
+# DEVELOPMENT TOOLS AND IDE
+# =============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# AI Coding Assistants and Tools
+.claude/
+.roo/
+.cline/
+.cursor/
+.windsurf/
+.aider/
+.copilot/
+.github-copilot/
+.ai-assistant/
+.codegpt/
+.tabnine/
+.kite/
+.rauemi/
+
+# AI Chat and Session Files
+*.ai-chat
+*.ai-session
+.ai-context/
+.chat-history/
+.assistant-logs/
+
+# =============================================================================
+# OPERATING SYSTEM FILES
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# LOGS AND RUNTIME
+# =============================================================================
+
+# Application logs
+*.log
+logs/
+log/
+rl_elo_prediction.log
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# =============================================================================
+# DOCKER AND CONTAINERS
+# =============================================================================
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# =============================================================================
+# VERSION CONTROL
+# =============================================================================
+
+# Git
+.git/
+.gitattributes
+
+# =============================================================================
+# TESTING AND COVERAGE
+# =============================================================================
+
+# Test artifacts
+.pytest_cache/
+test-results/
+test-reports/
+
+# =============================================================================
+# DOCUMENTATION BUILDS
+# =============================================================================
+
+# Sphinx documentation
+docs/_build/
+doc/_build/
+
+# =============================================================================
+# CLOUD AND DEPLOYMENT
+# =============================================================================
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# =============================================================================
+# MISCELLANEOUS
+# =============================================================================
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files (typically large)
+*.tar
+*.tar.gz
+*.rar
+*.zip
+*.7z
+
+# =============================================================================
+# KEEP THESE FILES (EXPLICIT INCLUSION)
+# =============================================================================
+# Use with: git add -f <file> to force include if needed
+
+__init__.py
+
+
+# Essential configuration files to keep:
+# - pyproject.toml
+# - package.json
+# - requirements.txt (if small)
+# - docker-compose.yml
+# - Dockerfile
+# - README files
+# - Small config files (<1MB)
+
+# =============================================================================
+# NOTES FOR DEVELOPERS
+# =============================================================================
+# 
+# LARGE FILES EXCLUDED:
+# - All datasets in data/ folders (~several GB)
+# - Trained ML models (~hundreds of MB each)
+# - Model checkpoints and training artifacts
+# - Historical NRL data files
+# - Cache and temporary files
+#
+# TO RESTORE DATA:
+# - Run data collection scripts
+# - Download models from cloud storage
+# - Retrain models using provided training scripts
+# - Generate cache files through normal operation
+#
+# BEFORE COMMITTING:
+# - Run: git status to verify no large files are staged
+# - Consider using Git LFS for essential large files
+# - Use cloud storage (S3, GCS) for model artifacts
+#
+# =============================================================================

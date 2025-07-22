@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  prediction-engine:
+    build:
+      context: ../../services/prediction-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://username:password@postgres:5432/predictions
+      - REDIS_URL=redis://redis:6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    networks:
+      - app-network
+
+  user-management:
+    build:
+      context: ../../services/user-management
+      dockerfile: Dockerfile
+    ports:
+      - "8007:8007"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://username:password@postgres:5432/users
+      - FIREBASE_CONFIG_PATH=/app/config/firebase_service_account.json
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  subscription-billing:
+    build:
+      context: ../../services/subscription-billing
+      dockerfile: Dockerfile
+    ports:
+      - "8010:8010"
+    environment:
+      - ENVIRONMENT=production
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - DATABASE_URL=postgresql://username:password@postgres:5432/billing
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  chat-assistant:
+    build:
+      context: ../../services/chat-assistant
+      dockerfile: Dockerfile
+    ports:
+      - "8008:8008"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://username:password@postgres:5432/chat
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://api-gateway:8000
+    depends_on:
+      - api-gateway
+    networks:
+      - app-network
+
+  api-gateway:
+    image: kong:3.4
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/kong/declarative/kong.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    volumes:
+      - ../kong/kong.yml:/kong/declarative/kong.yml
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=ai_betting
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - app-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+    networks:
+      - app-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

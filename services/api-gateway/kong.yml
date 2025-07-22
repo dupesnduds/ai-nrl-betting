@@ -1,0 +1,195 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: prediction-engine
+    url: http://prediction-engine:8001
+    tags:
+      - ai-betting
+      - prediction
+    routes:
+      - name: prediction-routes
+        paths:
+          - /api/v1/predict
+          - /api/v1/models
+          - /api/v1/teams
+        methods:
+          - GET
+          - POST
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 1000
+          policy: local
+          hide_client_headers: false
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 1
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - "X-Service-Name:prediction-engine"
+              - "X-RateLimit-Remaining-Minute:$(X-RateLimit-Remaining-minute)"
+      - name: cors
+        config:
+          origins:
+            - "http://localhost:3000"
+            - "http://localhost:5173"
+          methods:
+            - GET
+            - POST
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+          exposed_headers:
+            - X-Auth-Token
+          credentials: true
+          max_age: 3600
+
+  - name: user-management
+    url: http://user-management:8003
+    tags:
+      - ai-betting
+      - users
+    routes:
+      - name: user-routes
+        paths:
+          - /api/v1/users
+          - /api/v1/auth
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 50
+          hour: 500
+          policy: local
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 0.5
+
+  - name: chat-assistant
+    url: http://chat-assistant:8002
+    tags:
+      - ai-betting
+      - chat
+    routes:
+      - name: chat-routes
+        paths:
+          - /api/v1/chat
+        methods:
+          - POST
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 30
+          hour: 200
+          policy: local
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 0.1
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - "X-Service-Name:chat-assistant"
+
+  - name: subscription-billing
+    url: http://subscription-billing:8004
+    tags:
+      - ai-betting
+      - billing
+    routes:
+      - name: billing-routes
+        paths:
+          - /api/v1/subscriptions
+          - /api/v1/billing
+          - /api/v1/payments
+        methods:
+          - GET
+          - POST
+          - PUT
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 20
+          hour: 100
+          policy: local
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 0.5
+
+# Global plugins
+plugins:
+  - name: prometheus
+    config:
+      per_consumer: true
+      status_code_metrics: true
+      latency_metrics: true
+      bandwidth_metrics: true
+      upstream_health_metrics: true
+  
+  - name: request-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid
+      echo_downstream: false
+  
+  - name: correlation-id
+    config:
+      header_name: X-Correlation-ID
+      generator: uuid
+      echo_downstream: true
+
+# Consumer definitions (for API key authentication)
+consumers:
+  - username: frontend-app
+    tags:
+      - frontend
+    keyauth_credentials:
+      - key: frontend-api-key-12345
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 200
+          hour: 2000
+          policy: local
+
+  - username: mobile-app
+    tags:
+      - mobile
+    keyauth_credentials:
+      - key: mobile-api-key-67890
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 150
+          hour: 1500
+          policy: local
+
+  - username: premium-tier
+    tags:
+      - premium
+    keyauth_credentials:
+      - key: premium-api-key-abc123
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 500
+          hour: 5000
+          policy: local
